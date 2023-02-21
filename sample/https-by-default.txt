@@ -1,0 +1,50 @@
+"This is the twenty-second post in an ongoing series describing new privacy features in Brave. This post describes work done by Research and Privacy Engineer Arthur Edelstein. This post was written by VP of Privacy Engineering Peter Snyder.
+
+Starting in version 1.50, Brave will include a new feature called “HTTPS by Default” that improves Web security and privacy by increasing HTTPS use. Brave will upgrade all sites to HTTPS, falling back to HTTP only if the site does not support HTTPS, or in the rare case a site is known to not function correctly when loaded over HTTPS. This feature is the most protective, aggressive default HTTPS policy of any popular browser, and will be available on Android and Desktop versions of the Brave browser to begin with, with iOS coming later.
+
+HTTPS by Default improves on Brave’s existing, list based approach for upgrading sites.
+
+HTTPS is critical to security and privacy on the Web
+HTTPS is a vital part of a private and secure Web. Unless you load sites over HTTPS, your ISP (and other parties) can see what you load, say, and send to websites. While you shouldn’t assume an HTTPS site respects your privacy, you can be certain that a site that doesn’t use HTTPS is putting your privacy at risk.
+
+For example, if you visit example.site from your phone, the request might leave your phone, be sent to your mobile carrier, then sent to the example.site server. The site’s server would then respond with the page you requested, which would then move back through your mobile carrier to your phone. If the site is fetched over HTTP, your mobile carrier would be able to see exactly what you sent to example.site’s servers, along with what example.site said in response. If, however, example.site is loaded over HTTPS, your mobile carrier would not be able to see these details.
+
+In short, HTTPS is critical to protecting your privacy and security when using the Web.
+
+The challenge of knowing when to upgrade sites from HTTP to HTTPS
+Because HTTPS is critical to privacy and security, browsers like Brave are eager to load sites over HTTPS whenever possible. And since many sites today support only HTTPS, it’s simple to load these sites in a private and secure way. And encouragingly, more and more sites are being built or updated to support HTTPS only (or to use other TLS protected protocols, like secure web sockets).
+
+Unfortunately, there are many sites on the Web that still support HTTP, and some laggards that support only insecure HTTP connections. Brave’s goal is to automatically “upgrade” these sites to HTTPS whenever possible (i.e. in all cases where a site loads and functions correctly when loaded over HTTPS).
+
+But deciding when to upgrade a site to HTTPS is tricky. In cases where a website does not support HTTPS, attempting to upgrade from HTTP to HTTPS will produce an obvious error. Other sites support both HTTPS and HTTP, but do so from different domains (e.g. http://example.site vs. https://secure.example.site), making automatic upgrades tricky. And still other sites load “correctly” when fetched over HTTPS, but have broken functionality.
+
+In short, ideally browsers would never load sites over HTTP, and browsers could automatically upgrade all insecure requests to HTTPS. In practice though, it is difficult to know how, when, and if a site will function correctly when upgraded from HTTP to HTTPS.
+
+How Brave’s “HTTPS By Default” feature works
+Starting in version 1.50, the Brave browser will use a new system for upgrading insecure HTTP connections to secure-and-private HTTPS connections. The new feature, called “HTTPS By Default,” works as follows:
+
+If you are about to visit a page loaded over HTTP, Brave checks to see if the destination is on a list of sites that break when loaded over HTTPS. Brave maintains this list of “breaks-over-http” sites, which is open for anyone to view and use1. If the requested site is on the list, Brave will then allow the site to load over HTTP.
+
+Provided it’s not on that list, Brave will attempt to load the site over HTTPS (i.e. upgrade the navigation request from HTTP to HTTPS). If the server responds to the replacement HTTPS request with an error, then Brave assumes the server does not support HTTPS, and will load the site over HTTP.
+
+Otherwise, Brave will load the site over HTTPS, ensuring a more private and secure connection.
+
+Brave’s new “HTTPS by Default” feature replaces the previous list-based approach Brave has used since our first beta versions. In this approach, Brave used the HTTPS Everywhere list (a terrific, public resource maintained by the EFF) to decide when to upgrade HTTP connections to HTTPS. But while the HTTPS Everywhere list is useful, it has two important drawbacks:
+
+First, the HTTPS Everywhere list is no longer maintained, meaning that the list is increasingly out of date.
+
+Second, despite the best efforts of the EFF, any approach that uses a list of what sites should be upgraded is going to be limited, as the number of sites on the Web is enormous, and it’s difficult for the list maintainers to keep up. Brave’s approach, by contrast, maintains a smaller (and more manageable) list of sites to not upgrade.
+
+More broadly, the main benefit of Brave’s new “HTTPS by Default” feature is that it has a better default. In its default configuration, HTTPS Everywhere would allow unknown (i.e., not on the list) sites to load over HTTP; Brave’s new “HTTPS by Default” approach loads the site over HTTPS even in cases where the site is new or unknown2.
+
+Other ways Brave is advancing privacy
+Brave is especially excited about our new “HTTPS by Default” feature because it’s categorically different from the privacy features that Brave usually releases. Most of the privacy features in Brave work at the Web application layer—the browser modifies how websites execute in order to prevent those pages from re-identifying you.
+
+By contrast, the “HTTPS by Default” feature protects your privacy by improving the privacy of how you access websites (that is, before they even load in the browser). Both categories of privacy feature are important, and they complement each other well. Brave is excited to have the most privacy-protecting default features (in both categories) of any popular browser.
+
+Brave applies an even stronger level of protection when using Private Windows with Tor. In these cases Brave defaults to HTTPS-Only mode, where pages are able to load without confirmation only over HTTPS (otherwise the user is presented with a choice whether or not to proceed with an HTTP connection ). This provides even stronger protections than the “HTTPS by Default” setting, at the risk of some pages not working correctly, which we believe is the right trade off when using the Tor network. Users can enable HTTPS-Only mode for all windows in Brave (not only Private Windows with Tor) at brave://settings/shields.
+
+“HTTPS by Default” is one of many upcoming systems and proposals Brave has for improving Web privacy beyond the Web application level. For example, Brave’s recent STAR protocol allows for protocol-based protections on product analytics (what we call privacy-protecting product analytics, or P3A). Similarly, Brave’s FrodoPIR proposal provides protocol-level protections for querying whether a URL is malicious.
+
+Conclusion
+Brave is committed to promoting and protecting a user-centered Web, and that means constantly developing new protections at all levels of the browser stack. We believe that strong privacy should be enabled by default, so that all Web users, expert and beginner alike, can safely use the Web. We will be rolling out “HTTPS by Default”  (along with several other new privacy features) in the coming weeks.

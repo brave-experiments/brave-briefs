@@ -1,0 +1,10 @@
+Ethereum 2.0
+
+Ethereum enthusiasts gather for a Merge party in San Francisco in 2022
+Ethereum 2.0 (Eth2) was a set of three or more upgrades, also known as "phases", meant to transition the network's consensus mechanism to proof-of-stake, and to scale the network's transaction throughput with execution sharding and an improved EVM architecture.[49] The first of these three upgrades, also known as "phase 0", launched the proof-of-stake Beacon Chain on the 1st of December, 2020.[citation needed]
+
+Following the realisation that the Beacon Chain would be delivered much earlier than the later phases of the Eth2 roadmap, proposals were made for an "early Merge", expediting the delivery of proof-of-stake to Ethereum. Most importantly, the early Merge would not require any migration from Ethereum’s applications or its users, and would continue using the heavily battle-tested mainnet Ethereum clients in conjunction with the new proof-of-stake consensus clients.[citation needed]
+
+In early 2022, the “Ethereum 2.0” terminology was deprecated in an effort to highlight the existence of only one Ethereum network and one ether cryptocurrency. As a result of the effort, the Eth1 blockchain was renamed to the “execution layer”, and its associated Eth1 clients were reclassified as execution clients. Similarly, the Eth2 blockchain was renamed to the "consensus layer", and its associated Eth2 clients were reclassified as consensus clients.[citation needed]
+
+The switch from proof-of-work to proof-of-stake has cut Ethereum's energy usage by 99%. However, the impact this has on global energy consumption and climate change may be limited since the computers previously used for mining ether may be used to mine other cryptocurrencies that are energy-intensive.[11]
