@@ -8,7 +8,7 @@ model = pipeline('summarization', model='facebook/bart-large-cnn')
 
 def summarize_text(text, data):
     print('summarizing text with params: ', data)
-    summary = model(text[:3000], data['max_length'],
+    summary = model(text[:data['max_length']], data['max_length'],
                     data['min_length'], data['do_sample'])
     return summary[0]['summary_text']
 
