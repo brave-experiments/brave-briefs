@@ -1,9 +1,19 @@
 import base64
 from flask import Flask, request, jsonify
 import json
-from summarizer import summarize_text
+from summarizer import summarize_text, summarize_page
 
 app = Flask(__name__)
+
+
+def install_defaults(data):
+    if 'max_length' not in data:
+        data['max_length'] = 3000
+    if 'min_length' not in data:
+        data['min_length'] = 10
+    if 'do_sample' not in data:
+        data['do_sample'] = False
+    return data
 
 
 @app.route('/')
@@ -11,7 +21,20 @@ def answer_to_everything():
     return '42'
 
 
-@app.route('/summarize', methods=['POST'])
+@app.route('/page', methods=['POST'])
+def summarize_a_page():
+    data = request.get_json()
+    data = install_defaults(data)
+
+    url = data['url']
+    summary = summarize_page(url, data)
+    response = {
+        'summary': summary
+    }
+    return jsonify(response)
+
+
+@ app.route('/summarize', methods=['POST'])
 def summarize():
     if request.content_encoding == 'base64':
         # Decode the base64-encoded message body
@@ -22,8 +45,11 @@ def summarize():
         data = json.loads(decoded_string)
     else:
         data = request.get_json()
+
+    data = install_defaults(data)
+
     text = data['text']
-    summary = summarize_text(text)
+    summary = summarize_text(text, data)
     response = {
         'summary': summary
     }
