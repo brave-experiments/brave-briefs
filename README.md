@@ -26,8 +26,17 @@ Or directly using a JSON string:
 curl -X POST -H "Content-Type: application/json" -d '{"text": "The extremely quick brown fox jumps over the super lazy dog."}' http://localhost:5000/summarize
 ```
 
+```
+curl -X POST -H "Content-Type: application/json" -d '{"url": "https://gizmodo.com/usa-weather-half-cold-half-hot-february-forecast-1850140076","max_length":330}' http://localhost:5000/page
+```
+
 As demonstrated above, data can be sent in with base64 content encoding or directly in JSON.
 
+The following summarization parameters may be passed in the json:
+
+  max_length [int] - maximum length of the message
+  min_length [int] - minimum length of the message
+  do_sample [bool]
 
 # Development
 
