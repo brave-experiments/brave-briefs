@@ -28,6 +28,11 @@ curl -X POST -H "Content-Type: application/json" -d '{"text": "The extremely qui
 
 As demonstrated above, data can be sent in with base64 content encoding or directly in JSON.
 
+# Environment Variables (all optional)
+
+  DB_HOST=localhost
+  DB_DBNAME=database_name
+  MODEL=facebook/bart-large
 
 # Development
 
@@ -46,3 +51,10 @@ Install the requirements:
 To generate a new requirements file:
 
 `pip freeze > requirements.txt`
+
+To enable Postgres caching
+
+`createdb summarizer`
+`psql summarizer < migrations/0001-initial.sql`
+
+  Create a .env file and set DB_HOST and DB_DBNAME
