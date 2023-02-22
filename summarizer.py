@@ -72,12 +72,30 @@ def set_cached_result(key, result):
         pl.putconn(conn)
     else:
         logger.info('skipping cache as database not configured')
+        return None
+
+def set_cached_result(key, result):
+    hash = hashlib.sha256(key.encode('utf-8')).hexdigest()
+
+    # save the result in the cache
+    if os.environ.get("DB_HOST"):
+        # get a connection from the pool
+        conn = pl.getconn()
+        # create a cursor
+        cur = conn.cursor()
+        # execute the query
+        cur.execute('INSERT INTO cache (hash, result) VALUES (%s, %s) ON CONFLICT (hash) DO NOTHING', (hash, result))
+        # commit the query
+        conn.commit()
+        # put the connection back into the pool
+        pl.putconn(conn)
 
 def summarize_text(text, params):
     # check if the text is in the cache
     cached_result = get_cached_result(text)
     if cached_result:
         # if it is, return the cached result
+        logger.info('returning cached result')
         return cached_result
     else:
         # if it isn't, run the summarizer and save the result in the cache
@@ -88,7 +106,7 @@ def summarize_text(text, params):
             logger.info('not caching due to request parameters')
         return summary[0]['summary_text']
 
-def summarize_page(url, data):
+def summarize_page(url, params):
     # use beautiful soup to get the text from the page
     # then call summarize_text on the text
 
@@ -102,6 +120,6 @@ def summarize_page(url, data):
     text = soup.get_text()
 
     # summarize the text
-    summary = summarize_text(text, data)
+    summary = summarize_text(text, params)
 
     return summary

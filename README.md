@@ -37,6 +37,7 @@ The following summarization parameters may be passed in the json:
   max_length [int] - maximum length of the message
   min_length [int] - minimum length of the message
   do_sample [bool]
+  no_cache [bool]  - do not cache the results of this request
 
 # Environment Variables (all optional)
 
