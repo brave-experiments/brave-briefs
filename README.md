@@ -38,6 +38,12 @@ The following summarization parameters may be passed in the json:
   min_length [int] - minimum length of the message
   do_sample [bool]
 
+# Environment Variables (all optional)
+
+  DB_HOST=localhost
+  DB_DBNAME=database_name
+  MODEL=facebook/bart-large
+
 # Development
 
 Create a new virtual environment:
@@ -55,3 +61,10 @@ Install the requirements:
 To generate a new requirements file:
 
 `pip freeze > requirements.txt`
+
+To enable Postgres caching
+
+`createdb summarizer`
+`psql summarizer < migrations/0001-initial.sql`
+
+  Create a .env file and set DB_HOST and DB_DBNAME
