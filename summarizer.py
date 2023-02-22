@@ -59,6 +59,7 @@ def set_cached_result(key, result):
 
     # save the result in the cache
     if os.environ.get("DB_HOST"):
+        logger.info('caching results')
         # get a connection from the pool
         conn = pl.getconn()
         # create a cursor
@@ -69,8 +70,10 @@ def set_cached_result(key, result):
         conn.commit()
         # put the connection back into the pool
         pl.putconn(conn)
+    else:
+        logger.info('skipping cache as database not configured')
 
-def summarize_text(text):
+def summarize_text(text, params):
     # check if the text is in the cache
     cached_result = get_cached_result(text)
     if cached_result:
@@ -78,8 +81,11 @@ def summarize_text(text):
         return cached_result
     else:
         # if it isn't, run the summarizer and save the result in the cache
-        summary = model(text[:data['max_length']], max_length=100, min_length=30, do_sample=False)
-        set_cached_result(text, summary[0]['summary_text'])
+        summary = model(text[:params['max_length']], max_length=params['max_length'], min_length=params['min_length'], do_sample=params['do_sample'])
+        if 'no_cache' not in params or not params['no_cache']:
+            set_cached_result(text, summary[0]['summary_text'])
+        else:
+            logger.info('not caching due to request parameters')
         return summary[0]['summary_text']
 
 def summarize_page(url, data):
