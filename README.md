@@ -47,25 +47,34 @@ The following summarization parameters may be passed in the json:
 
 # Development
 
-Create a new virtual environment:
+## Create a new virtual environment
 
 `python3 -m venv env`
 
-Activate the virtual environment:
+## Activate the virtual environment
 
 `source ./env/bin/activate`
 
-Install the requirements:
+## Install the requirements
 
 `pip3 install -r requirements.txt`
 
-To generate a new requirements file:
+## To generate a new requirements file
 
 `pip freeze > requirements.txt`
 
-To enable Postgres caching
+## To enable Postgres caching
 
 `createdb summarizer`
 `psql summarizer < migrations/0001-initial.sql`
 
-  Create a .env file and set DB_HOST and DB_DBNAME
+Create a .env file and set DB_HOST and DB_DBNAME
+
+## Running tests
+
+`python3 -m unittest discover -s . -p '*_test.py'`
+
+
+## Lint the code
+
+`flake8 --exclude=site-packages,.git,env .`

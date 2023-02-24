@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Brave Briefs 🩲 </title>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/summarizer.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="input-container">
+    <textarea type="text" id="input" placeholder="Enter a URL or some text to summarize"></textarea>
+    <button id="summarize-button">Summarize</button>
+    <div class="loader"></div>
+  </div>
+  <div class="summary-results" id="summary-results"></div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import base64
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import json
 from summarizer import summarize_text, summarize_page
 
@@ -17,8 +17,8 @@ def install_defaults(data):
 
 
 @app.route('/')
-def answer_to_everything():
-    return '42'
+def index():
+    return render_template('summarize.html')
 
 
 @app.route('/page', methods=['POST'])
