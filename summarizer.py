@@ -49,7 +49,10 @@ def get_cached_result(key):
         # put the connection back into the pool
         pl.putconn(conn)
         # return the result
-        return result
+        if result:
+            return result[0]
+        else:
+            return None
     else:
         # if we're not using Postgres, just return None
         return None
