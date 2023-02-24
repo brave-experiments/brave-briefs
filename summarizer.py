@@ -50,10 +50,7 @@ def get_cached_result(key):
         # put the connection back into the pool
         pl.putconn(conn)
         # return the result
-        if result:
-            return result[0]
-        else:
-            return None
+        return result[0] if result else None
     else:
         # if we're not using Postgres, just return None
         return None
@@ -111,8 +108,12 @@ def summarize_page(url, params):
     # create a BeautifulSoup object
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    # get the text
-    text = soup.get_text()
+    # get the article element's text or the full page text if not found
+    article = soup.find('article')
+    if article:
+        text = article.get_text()
+    else:
+        text = soup.get_text()
 
     # summarize the text
     summary = summarize_text(text, params)
