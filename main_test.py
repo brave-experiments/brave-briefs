@@ -51,6 +51,5 @@ class TestMain(unittest.TestCase):
         mock_summarize_text.assert_called_once_with(data['text'],
                                                     install_defaults(data))
 
-
 if __name__ == '__main__':
     unittest.main()

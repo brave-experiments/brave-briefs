@@ -1,7 +1,9 @@
 import base64
 from flask import Flask, request, jsonify, render_template
 import json
-from summarizer import summarize_text, summarize_page
+from summarizer import summarize_text, summarize_page, embed_text, closest_embeddings, cluster, get_job_status
+import multiprocessing
+import uuid
 
 app = Flask(__name__)
 
@@ -33,8 +35,62 @@ def summarize_a_page():
     }
     return jsonify(response)
 
+@app.route('/cluster', methods=['POST'])
+def cluster_api():
+    data = request.get_json()
+    batch_id = data['batch_id']
+    k = data['k']
 
-@ app.route('/summarize', methods=['POST'])
+    # generate a unique uuid as the job id
+    job_id = str(uuid.uuid4())
+
+    process = multiprocessing.Process(target=cluster, args=(batch_id, k, job_id))
+    process.start()
+
+    response = {
+        'status': 'ok',
+        'job_id': job_id
+    }
+    return jsonify(response)
+
+# return the status of a job from the jobs table in the database
+@app.route('/jobs/<job_id>', methods=['GET'])
+def jobs(job_id):
+    status = get_job_status(job_id)
+
+    # if the status is None, then the job_id was not found in the database and we should return a 404
+    if status is None:
+        return 'Not found', 404
+    else:
+        response = {
+            'status': status
+        }
+        return jsonify(response)
+
+@app.route('/embed', methods=['POST'])
+def embed():
+    data = request.get_json()
+    text = data['text']
+    batch_id = data['batch_id']
+
+    embedding_id = embed_text(text, batch_id)
+
+    response = {
+        'embedding_id': embedding_id
+    }
+    return jsonify(response)
+
+@app.route('/embed/closest', methods=['GET'])
+def closest():
+    embedding_id = request.args.get('id')
+    n = request.args.get('n') or 5
+
+    closest = closest_embeddings(embedding_id, n)
+
+    response = closest 
+    return jsonify(response)
+
+@app.route('/summarize', methods=['POST'])
 def summarize():
     if request.content_encoding == 'base64':
         # Decode the base64-encoded message body
