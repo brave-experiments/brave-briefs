@@ -1,7 +1,7 @@
 import base64
 from flask import Flask, request, jsonify, render_template
 import json
-from summarizer import summarize_text, summarize_page
+from summarizer import summarize_text, summarize_page, train
 
 app = Flask(__name__)
 
@@ -54,6 +54,15 @@ def summarize():
         'summary': summary
     }
     return jsonify(response)
+
+
+@app.route('/train', methods=['POST'])
+def train_model():
+    data = request.get_json()
+    text = data['text']
+    summary_text = data['summary_text']
+    train(text, summary_text)
+    return '', 200
 
 
 if __name__ == '__main__':

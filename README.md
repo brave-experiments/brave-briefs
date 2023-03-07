@@ -30,6 +30,14 @@ curl -X POST -H "Content-Type: application/json" -d '{"text": "The extremely qui
 curl -X POST -H "Content-Type: application/json" -d '{"url": "https://gizmodo.com/usa-weather-half-cold-half-hot-february-forecast-1850140076","max_length":330}' http://localhost:5000/page
 ```
 
+Train with new data:
+
+```
+curl -X POST -H "Content-Type: application/json" -d '{"text": "The quick brown fox jumps over the lazy dog.", "summary_text": "an animal jumped"}' http://localhost:5000/train
+```
+
+
+
 As demonstrated above, data can be sent in with base64 content encoding or directly in JSON.
 
 The following summarization parameters may be passed in the json:

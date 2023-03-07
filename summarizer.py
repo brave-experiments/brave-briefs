@@ -1,11 +1,13 @@
 import os
 import hashlib
 from environs import Env
-from transformers import pipeline
+from transformers import pipeline, BartForConditionalGeneration, BartTokenizer, PretrainedConfig
 from bs4 import BeautifulSoup
 import requests
 import logging
 from psycopg2 import pool
+import torch
+import os
 
 env = Env()
 env.read_env()
@@ -17,7 +19,12 @@ logger = logging.getLogger(__name__)
 # Load the BART model
 model_name = os.environ.get("MODEL") or 'facebook/bart-large-cnn'
 logger.info(f"Loading model {model_name}...")
-model = pipeline('summarization', model=model_name)
+model = BartForConditionalGeneration.from_pretrained(model_name)
+tokenizer = BartTokenizer.from_pretrained(model_name)
+if os.path.exists(model_name):
+  logger.info(f"Model {model_name} loaded locally.")
+else:
+  logger.info(f"Model {model_name} loaded from the hub.")
 
 # initialize Postgres connection pool
 pl = None
@@ -86,15 +93,26 @@ def summarize_text(text, params):
         logger.info('returning cached result')
         return cached_result
     else:
+        # Initialize the BART tokenizer
+
+        # Encode the input text using the tokenizer
+        inputs = tokenizer.encode(text, return_tensors='pt')
+
         # if it isn't, run the summarizer and save the result in the cache
-        summary = model(text[:params['max_length']],
+        summary_ids = model.generate(inputs,
                         max_length=params['max_length'],
                         min_length=params['min_length'],
                         do_sample=params['do_sample'])
-        if 'no_cache' not in params or not params['no_cache']:
-            set_cached_result(text, summary[0]['summary_text'])
-        else:
-            logger.info('not caching due to request parameters')
+
+        # Decode the summary text from the summary_ids
+        summary_text = tokenizer.decode(summary_ids[0],
+                                    skip_special_tokens=True)
+        return summary_text
+
+    #if 'no_cache' not in params or not params['no_cache']:
+    #        set_cached_result(text, summary[0]['summary_text'])
+    #    else:
+    #        logger.info('not caching due to request parameters')
         return summary[0]['summary_text']
 
 
@@ -119,3 +137,35 @@ def summarize_page(url, params):
     summary = summarize_text(text, params)
 
     return summary
+
+
+def train(text, summary_text):
+    # Encode the input and summary text using the tokenizer
+    input_ids = tokenizer.encode(text, return_tensors='pt')
+    output_ids = tokenizer.encode(summary_text, return_tensors='pt')
+
+    # Define the model's hyperparameters and optimizer
+    learning_rate = 1e-5
+    num_epochs = 3
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Train the model
+    model.train()
+    for epoch in range(num_epochs):
+        # Forward pass
+        outputs = model(input_ids, labels=output_ids)
+
+        # Compute the loss
+        loss = outputs.loss
+
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+
+        # Update the parameters
+        optimizer.step()
+
+    # Save the trained model
+    model.save_pretrained(model_name)
+    # After we save locally with the same model name, it'll also look for the tokenizer json
+    tokenizer.save_pretrained(model_name)
