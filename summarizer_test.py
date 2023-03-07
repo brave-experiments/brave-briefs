@@ -1,5 +1,5 @@
 import requests_mock
-from summarizer import summarize_text, summarize_page
+from summarizer import summarize_text, summarize_page, get_job_status
 import unittest
 from unittest.mock import patch
 
@@ -46,6 +46,7 @@ class TestSummarizer(unittest.TestCase):
                   self.text + '</article></body></html>')
             summary = summarize_page(url, self.data)
             self.assertEqual(summary, self.mocked_summary)
+
 
 
 if __name__ == '__main__':

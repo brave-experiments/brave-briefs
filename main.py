@@ -1,9 +1,10 @@
 import base64
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, make_response
 import json
-from summarizer import summarize_text, summarize_page, embed_text, closest_embeddings, cluster, get_job_status
+from summarizer import summarize_text, summarize_page, embed_text, closest_embeddings, cluster, get_job_status, visualize
 import multiprocessing
 import uuid
+import io
 
 app = Flask(__name__)
 
@@ -110,6 +111,19 @@ def summarize():
         'summary': summary
     }
     return jsonify(response)
+
+@app.route('/visualize/<batch_id>', methods=['GET'])
+def reduce_vectors(batch_id):
+    image = visualize(batch_id)
+
+    # create a response object from the image data
+    img_bytes = io.BytesIO()
+    image.save(img_bytes, format='PNG')
+    img_bytes.seek(0)
+    response = make_response(img_bytes.getvalue())
+    response.headers.set('Content-Type', 'image/png')
+
+    return response
 
 
 if __name__ == '__main__':

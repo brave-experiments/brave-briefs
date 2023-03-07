@@ -8,6 +8,9 @@ import logging
 from psycopg2 import pool
 from sklearn.cluster import KMeans
 import ast
+from PIL import Image, ImageDraw
+from sklearn.decomposition import PCA
+import numpy as np
 
 from sentence_transformers import SentenceTransformer
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -219,9 +222,40 @@ def get_job_status(id):
     cur.execute('SELECT status FROM jobs WHERE id = %s', (id,))
     row = cur.fetchone()
     pl.putconn(conn)
+
     # if the job doesn't exist, return None
     if not row:
         return None
     else:
         status = row[0]
         return status
+
+# visualize the clusters in the given batch
+def visualize(batch_id):
+    conn = pl.getconn()
+    cursor = conn.cursor()
+    query = f"SELECT embedding, cluster FROM embeddings WHERE batch_id = %s"
+    cursor.execute(query, (batch_id,))
+    results = cursor.fetchall()
+
+    embeddings = [ast.literal_eval(result[0]) for result in results]
+
+    vectors = np.array(embeddings)
+    pca = PCA(n_components=2)
+    reduced_vectors = pca.fit_transform(vectors)
+
+    color_palette = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+
+    clusters = np.array([int(result[1]) for result in results])
+
+    image_size = (512, 512)
+    image = Image.new('RGB', image_size)
+    draw = ImageDraw.Draw(image)
+    for i, vector in enumerate(reduced_vectors):
+        # the vectors are in the range [-1, 1]
+        # the x and y values should be in the range [0, image_size]
+        x = int((vector[0] + 1) * image_size[0] / 2)
+        y = int((vector[1] + 1) * image_size[1] / 2)
+        draw.ellipse((x - 2, y - 2, x + 2, y + 2), fill=color_palette[clusters[i] % len(color_palette)])
+
+    return image
